@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  --card: #111111;
+  --muted: #a0a0a0;
+  --border: #242424;
+  --gold: #c9a84c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-gold: var(--gold);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.admin-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+
+.gold-button {
+  background: var(--gold);
+  color: #0a0a0a;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: filter 0.2s ease;
+}
+
+.gold-button:hover {
+  filter: brightness(1.08);
+}
+
+.text-muted {
+  color: var(--muted);
+}
