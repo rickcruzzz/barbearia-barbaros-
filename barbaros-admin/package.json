@@ -6,6 +6,9 @@
   "engines": {
     "node": ">=18.18.0"
   },
+  "pnpm": {
+    "ignoredBuiltDependencies": ["sharp", "unrs-resolver"]
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

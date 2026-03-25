@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { Calendar } from "lucide-react";
 import { WhatsAppIcon } from "@/components/WhatsAppButton";
 import heroBg from "@/assets/hero-bg.jpg";
 import heroBgMobile from "@/assets/hero-bg-mobile.png";
@@ -31,18 +33,25 @@ export default function HeroSection() {
         <p className="font-body text-lg sm:text-xl lg:text-2xl text-foreground/75 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-medium">
           Cortes modernos, barba na régua e uma experiência que vai além da cadeira.
         </p>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center justify-center gap-3">
+          <Link
+            to="/agendar"
+            className="btn-gold w-full sm:w-auto text-base py-3.5 sm:py-3 inline-flex items-center justify-center gap-2"
+          >
+            <Calendar className="h-5 w-5 shrink-0" aria-hidden />
+            Reservar horário
+          </Link>
           <a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-gold w-full sm:w-auto text-base py-3.5 sm:py-3"
+            className="btn-outline-gold w-full sm:w-auto text-base py-3.5 sm:py-3 inline-flex items-center justify-center gap-2"
           >
-            <WhatsAppIcon className="h-5 w-5" />
-            Agendar via WhatsApp
+            <WhatsAppIcon className="h-5 w-5 shrink-0" />
+            Falar no WhatsApp
           </a>
           <a href="#servicos" className="btn-outline-gold w-full sm:w-auto text-base py-3.5 sm:py-3">
-            Ver Serviços
+            Ver serviços
           </a>
         </div>
       </div>

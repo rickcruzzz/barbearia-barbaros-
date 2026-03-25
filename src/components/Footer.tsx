@@ -19,6 +19,10 @@ const SERVICE_LINKS = [
   "Domicílio",
 ];
 
+const adminPanelHref =
+  (import.meta.env.VITE_ADMIN_PORTAL_URL ?? "").trim() ||
+  (import.meta.env.DEV ? "http://localhost:3000/login" : "");
+
 export default function Footer() {
   return (
     <footer className="bg-background border-t border-primary/20">
@@ -74,6 +78,28 @@ export default function Footer() {
           >
             <ArrowUp className="h-4 w-4" />
           </button>
+        </div>
+
+        <div className="mt-8 pt-5 border-t border-primary/10 text-center space-y-2">
+          <p className="font-body text-[10px] sm:text-xs uppercase tracking-[0.2em] text-muted-foreground/55">
+            Área da equipe
+          </p>
+          {adminPanelHref ? (
+            <a
+              href={adminPanelHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-body inline-block text-sm font-medium text-primary/90 hover:text-primary underline-offset-4 hover:underline transition-colors"
+            >
+              Entrar no painel administrativo
+            </a>
+          ) : import.meta.env.DEV ? (
+            <p className="font-body text-xs text-muted-foreground/60 max-w-md mx-auto">
+              Em produção, defina <code className="text-[11px]">VITE_ADMIN_PORTAL_URL</code> no <code className="text-[11px]">.env.local</code> ou na Vercel (URL do login do painel).
+            </p>
+          ) : (
+            <p className="font-body text-xs text-muted-foreground/40">Acesso reservado à equipe.</p>
+          )}
         </div>
       </div>
     </footer>

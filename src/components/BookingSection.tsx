@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Clock, Home as HomeIcon } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import ctaBg from "@/assets/cta-bg.jpg";
@@ -33,11 +34,32 @@ export default function BookingSection() {
         <div className="max-w-2xl mx-auto text-center">
           <p className="font-body text-xs uppercase tracking-[0.3em] text-primary mb-3 animate-on-scroll">Agendamento</p>
           <h2 className="section-title text-foreground mb-4 animate-on-scroll">Pronto para se cuidar?</h2>
-          <p className="section-subtitle mx-auto mb-10 animate-on-scroll">
-            Agende seu horário em menos de 1 minuto pelo WhatsApp. Sem complicação, sem fila.
+          <p className="section-subtitle mx-auto mb-8 animate-on-scroll">
+            Escolha serviço, profissional e horário com disponibilidade em tempo real. Depois você recebe confirmação pelo WhatsApp.
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4 mb-8 animate-on-scroll">
+          <div className="space-y-3 mb-8 animate-on-scroll">
+            <Link to="/agendar" className="btn-gold w-full py-4 text-center block">
+              Agendar online agora
+            </Link>
+            <button
+              type="button"
+              onClick={() =>
+                window.open(
+                  `https://wa.me/5571983542132?text=${encodeURIComponent("Olá! Gostaria de agendar um horário na Bárbaros.")}`,
+                  "_blank"
+                )
+              }
+              className="btn-outline-gold w-full py-4"
+            >
+              Mensagem rápida no WhatsApp
+            </button>
+          </div>
+
+          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-4 animate-on-scroll">
+            Ou preencha e envie pelo WhatsApp
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-4 mb-8 animate-on-scroll rounded-lg border border-primary/15 bg-background/40 p-4 md:p-5">
             <input
               type="text"
               placeholder="Seu nome"
@@ -61,12 +83,9 @@ export default function BookingSection() {
               onChange={(e) => setDate(e.target.value)}
               className="w-full bg-secondary border border-primary/20 rounded px-4 py-3 font-body text-sm text-foreground focus:outline-none focus:border-primary transition-colors"
             />
-            <button type="submit" className="btn-gold w-full py-4">
-              Agendar pelo WhatsApp
+            <button type="submit" className="btn-outline-gold w-full py-4">
+              Enviar pedido pelo WhatsApp
             </button>
-            <a href="/agendar" className="btn-outline-gold w-full py-4 justify-center">
-              Agendamento online completo
-            </a>
           </form>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-muted-foreground animate-on-scroll">

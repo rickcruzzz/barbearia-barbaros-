@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabasePublic, hasSupabasePublicEnv } from "@/lib/supabasePublic";
+import logoPremium from "@/assets/logo-premium.png";
 
 type Service = { id: string; name: string; duration_minutes: number; price: number };
 type Barber = { id: string; name: string; photo_url?: string | null };
@@ -137,6 +138,56 @@ function getInitials(name: string) {
 }
 
 const ALL_SLOTS = generateSlots();
+
+const BOOKING_STEP_LABELS = ["Serviço", "Profissional", "Data", "Horário", "Dados"] as const;
+
+function BookingStepIndicator({ step }: { step: number }) {
+  return (
+    <div className="mb-8">
+      <p className="font-body text-center text-xs uppercase tracking-[0.2em] text-primary mb-4">
+        {step < 6 ? `Etapa ${step} de 5` : "Concluído"}
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-1">
+        {BOOKING_STEP_LABELS.map((label, i) => {
+          const n = i + 1;
+          const done = step === 6 || step > n;
+          const current = step === n && step < 6;
+          return (
+            <div key={label} className="flex items-center gap-1 sm:gap-2">
+              <div className="flex flex-col items-center gap-1 min-w-[3.5rem] sm:min-w-0">
+                <span
+                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-semibold border-2 transition-colors ${
+                    done
+                      ? "border-primary bg-primary/20 text-primary"
+                      : current
+                        ? "border-primary text-primary shadow-[0_0_0_1px_hsl(var(--primary)/0.35)]"
+                        : "border-primary/25 text-muted-foreground"
+                  }`}
+                  aria-current={current ? "step" : undefined}
+                >
+                  {done && step !== n ? "✓" : n}
+                </span>
+                <span
+                  className={`text-[10px] sm:text-xs uppercase tracking-wider text-center max-w-[4.5rem] sm:max-w-none leading-tight ${
+                    current || done ? "text-foreground" : "text-muted-foreground"
+                  }`}
+                >
+                  {label}
+                </span>
+              </div>
+              {i < BOOKING_STEP_LABELS.length - 1 ? (
+                <span
+                  className="hidden sm:block w-4 md:w-8 h-px shrink-0 bg-primary/25 mb-5"
+                  aria-hidden
+                />
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function AgendarPage() {
   const navigate = useNavigate();
@@ -470,45 +521,67 @@ export default function AgendarPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground py-24 px-4">
-      <div className="container max-w-3xl">
-        <div className="mb-8">
-          <Link to="/" className="text-sm text-primary hover:underline">← Voltar ao site</Link>
-          <h1 className="section-title mt-3">Agendamento online</h1>
-          <p className="text-muted-foreground mt-2">Selecione serviço, profissional, data e horário em poucos passos.</p>
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="border-b border-primary/25 bg-gradient-to-b from-black/90 via-background to-background">
+        <div className="container max-w-3xl px-4 pt-10 pb-8">
+          <Link to="/" className="inline-flex text-sm font-medium text-primary hover:underline">
+            ← Voltar ao site
+          </Link>
+          <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
+            <div className="brand-logo-frame brand-logo-frame--header shrink-0 self-start sm:self-center">
+              <img src={logoPremium} alt="" className="brand-logo-img brand-logo-img--header" width={120} height={40} />
+            </div>
+            <div>
+              <p className="font-body text-xs uppercase tracking-[0.3em] text-primary mb-2">Bárbaros Barbershop</p>
+              <h1 className="font-display text-3xl sm:text-4xl font-bold text-foreground tracking-tight">Reserva oficial</h1>
+              <p className="text-muted-foreground mt-2 text-base max-w-xl">
+                Horários alinhados à agenda real da equipe. Após enviar, você recebe confirmação pelo WhatsApp.
+              </p>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div className="card-dark p-6 md:p-8">
-          <p className="font-body text-xs uppercase tracking-[0.25em] text-primary mb-5">Etapa {step} de 6</p>
+      <div className="container max-w-3xl px-4 py-10 md:py-12">
+        <div className="card-dark p-6 md:p-10 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+          {step < 6 ? <BookingStepIndicator step={step} /> : null}
           {baseDataError ? <p className="mb-4 text-sm text-amber-300">{baseDataError}</p> : null}
           {submitError ? <p className="mb-4 text-sm text-red-300">{submitError}</p> : null}
 
           {step === 1 && (
-            <div className="space-y-3">
-              <h2 className="font-display text-xl">1. Selecione o serviço</h2>
+            <div className="space-y-4">
+              <h2 className="font-display text-2xl md:text-3xl text-foreground">Selecione o serviço</h2>
               {services.map((service) => (
-                <button key={service.id} onClick={() => setServiceId(service.id)} className={`w-full text-left rounded border p-3 transition-colors ${serviceId === service.id ? "border-primary bg-primary/10" : "border-primary/20 hover:border-primary/40"}`}>
-                  <p className="font-medium">{service.name}</p>
-                  <p className="text-sm text-muted-foreground">{service.duration_minutes} min • R$ {service.price.toFixed(2)}</p>
+                <button
+                  key={service.id}
+                  onClick={() => setServiceId(service.id)}
+                  className={`w-full text-left rounded-lg border p-4 md:p-5 transition-colors ${serviceId === service.id ? "border-primary bg-primary/10 ring-1 ring-primary/30" : "border-primary/20 hover:border-primary/45"}`}
+                >
+                  <p className="font-semibold text-lg">{service.name}</p>
+                  <p className="text-sm text-muted-foreground mt-1">{service.duration_minutes} min • R$ {service.price.toFixed(2)}</p>
                 </button>
               ))}
             </div>
           )}
 
           {step === 2 && (
-            <div className="space-y-3">
-              <h2 className="font-display text-xl">2. Selecione o barbeiro</h2>
+            <div className="space-y-4">
+              <h2 className="font-display text-2xl md:text-3xl text-foreground">Selecione o profissional</h2>
               {barbers.map((barber) => (
-                <button key={barber.id} onClick={() => setBarberId(barber.id)} className={`w-full text-left rounded border p-3 transition-colors ${barberId === barber.id ? "border-primary bg-primary/10" : "border-primary/20 hover:border-primary/40"}`}>
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 overflow-hidden rounded-full border border-primary/30 bg-secondary grid place-items-center text-xs font-semibold">
+                <button
+                  key={barber.id}
+                  onClick={() => setBarberId(barber.id)}
+                  className={`w-full text-left rounded-lg border p-4 md:p-5 transition-colors ${barberId === barber.id ? "border-primary bg-primary/10 ring-1 ring-primary/30" : "border-primary/20 hover:border-primary/45"}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 overflow-hidden rounded-full border border-primary/30 bg-secondary grid place-items-center text-sm font-semibold shrink-0">
                       {barber.photo_url ? (
                         <img src={barber.photo_url} alt={`Foto de ${barber.name}`} className="h-full w-full object-cover" />
                       ) : (
                         getInitials(barber.name)
                       )}
                     </div>
-                    <span>{barber.name}</span>
+                    <span className="font-semibold text-lg">{barber.name}</span>
                   </div>
                 </button>
               ))}
@@ -516,20 +589,29 @@ export default function AgendarPage() {
           )}
 
           {step === 3 && (
-            <div className="space-y-3">
-              <h2 className="font-display text-xl">3. Selecione a data</h2>
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full bg-secondary border border-primary/20 rounded px-4 py-3" />
+            <div className="space-y-4">
+              <h2 className="font-display text-2xl md:text-3xl text-foreground">Escolha a data</h2>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full max-w-sm bg-secondary border border-primary/20 rounded-lg px-4 py-3.5 text-base"
+              />
             </div>
           )}
 
           {step === 4 && (
-            <div className="space-y-3">
-              <h2 className="font-display text-xl">4. Selecione o horário</h2>
+            <div className="space-y-4">
+              <h2 className="font-display text-2xl md:text-3xl text-foreground">Escolha o horário</h2>
               {loadingSlots ? <p className="text-sm text-muted-foreground">Carregando horários...</p> : null}
               {availabilityError ? <p className="text-sm text-red-300">{availabilityError}</p> : null}
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                 {availableSlots.map((slot) => (
-                  <button key={slot} onClick={() => setTime(slot)} className={`rounded border px-3 py-2 text-sm ${time === slot ? "border-primary bg-primary/10" : "border-primary/20 hover:border-primary/40"}`}>
+                  <button
+                    key={slot}
+                    onClick={() => setTime(slot)}
+                    className={`rounded-lg border px-3 py-3 text-sm font-medium ${time === slot ? "border-primary bg-primary/15 text-primary" : "border-primary/20 hover:border-primary/45"}`}
+                  >
                     {slot}
                   </button>
                 ))}
@@ -539,11 +621,30 @@ export default function AgendarPage() {
           )}
 
           {step === 5 && (
-            <div className="space-y-3">
-              <h2 className="font-display text-xl">5. Seus dados</h2>
-              <input type="text" placeholder="Nome completo" value={name} onChange={(e) => setName(e.target.value)} className="w-full bg-secondary border border-primary/20 rounded px-4 py-3" />
-              <input type="tel" placeholder="Telefone" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-secondary border border-primary/20 rounded px-4 py-3" />
-              <input type="email" placeholder="E-mail (opcional)" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-secondary border border-primary/20 rounded px-4 py-3" />
+            <div className="space-y-4">
+              <h2 className="font-display text-2xl md:text-3xl text-foreground">Seus dados</h2>
+              <p className="text-sm text-muted-foreground">Usados para identificar sua reserva e contato de confirmação.</p>
+              <input
+                type="text"
+                placeholder="Nome completo"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full bg-secondary border border-primary/20 rounded-lg px-4 py-3.5 text-base"
+              />
+              <input
+                type="tel"
+                placeholder="Telefone (com DDD)"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full bg-secondary border border-primary/20 rounded-lg px-4 py-3.5 text-base"
+              />
+              <input
+                type="email"
+                placeholder="E-mail (opcional)"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-secondary border border-primary/20 rounded-lg px-4 py-3.5 text-base"
+              />
               <input
                 type="text"
                 tabIndex={-1}
@@ -553,13 +654,13 @@ export default function AgendarPage() {
                 onChange={(e) => setWebsiteField(e.target.value)}
                 className="hidden"
               />
-              <div className="rounded border border-primary/20 p-3">
+              <div className="rounded-lg border border-primary/20 p-4 bg-secondary/30">
                 <p className="mb-2 text-sm text-muted-foreground">Validação de segurança: quanto é {captchaA} + {captchaB}?</p>
                 <input
                   type="number"
                   value={captchaAnswer}
                   onChange={(e) => setCaptchaAnswer(e.target.value)}
-                  className="w-full bg-secondary border border-primary/20 rounded px-4 py-3"
+                  className="w-full bg-secondary border border-primary/20 rounded-lg px-4 py-3.5 text-base"
                   placeholder="Digite o resultado"
                 />
               </div>
@@ -567,31 +668,42 @@ export default function AgendarPage() {
           )}
 
           {step === 6 && (
-            <div className="text-center py-8">
-              <CheckCircle2 className="h-12 w-12 mx-auto text-primary mb-3" />
-              <h2 className="font-display text-2xl mb-2">Agendamento enviado</h2>
-              <p className="text-muted-foreground">Seu pedido foi registrado e enviado para confirmação no WhatsApp.</p>
+            <div className="text-center py-6 md:py-10">
+              <CheckCircle2 className="h-14 w-14 mx-auto text-primary mb-4" strokeWidth={1.5} />
+              <h2 className="font-display text-2xl md:text-3xl mb-3">Reserva registrada</h2>
+              <p className="text-muted-foreground text-base max-w-md mx-auto leading-relaxed">
+                Seu horário foi salvo na nossa agenda. Abri também uma conversa no WhatsApp para você alinhar detalhes e
+                confirmação com a equipe.
+              </p>
             </div>
           )}
 
-          <div className="mt-8 flex items-center justify-between">
+          <div className="mt-10 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <button
               onClick={handleBack}
-              className="btn-outline-gold text-xs"
+              className="btn-outline-gold text-sm py-3 px-5 inline-flex items-center justify-center gap-2"
               disabled={saving}
             >
               <ChevronLeft className="h-4 w-4" /> Voltar
             </button>
 
             {step < 5 && (
-              <button onClick={() => setStep((old) => old + 1)} className="btn-gold text-xs" disabled={!canAdvance()}>
+              <button
+                onClick={() => setStep((old) => old + 1)}
+                className="btn-gold text-sm py-3 px-6 inline-flex items-center justify-center gap-2"
+                disabled={!canAdvance()}
+              >
                 Avançar <ChevronRight className="h-4 w-4" />
               </button>
             )}
 
             {step === 5 && (
-              <button onClick={submitAppointment} className="btn-gold text-xs" disabled={!canAdvance() || saving}>
-                {saving ? "Enviando..." : "Confirmar agendamento"}
+              <button
+                onClick={submitAppointment}
+                className="btn-gold text-sm py-3 px-6 inline-flex items-center justify-center gap-2"
+                disabled={!canAdvance() || saving}
+              >
+                {saving ? "Enviando..." : "Confirmar reserva"}
               </button>
             )}
           </div>
